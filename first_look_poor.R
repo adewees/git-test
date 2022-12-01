@@ -110,7 +110,6 @@ plot_poor <- plot_poor %>% mutate(IDP2_Q =ifelse(sch_aget_hh >= .359,"Q1",""))%>
   mutate(IDP2_Q =ifelse(sch_aget_hh <0.127 ,"Q5",IDP2_Q))
 register_google(key = "AIzaSyB4H7pcbjnnvEuq7yNKGcsRiXQ0s-vkCvA")
 cambodia <-st_read("~/R/Projects/Cambodia/shape/admin2/khm_admbnda_adm2_gov_20181004.shp")
-outline <- (st_union(cambodia$geom))
 cambodia2 <-st_read("~/R/Projects/Cambodia/shape/admin1/khm_admbnda_adm1_gov_20181004.shp")
 cambodia_ft <- fortify(cambodia)
 cambodia2_ft<- fortify(cambodia2)
@@ -143,7 +142,6 @@ dis_idp <- ggplot() +
                                ADM1_PCODE != "KH14"&
                                ADM1_PCODE != "KH20"&
                                ADM1_PCODE != "KH25"), aes(label = ADM2_EN),size = 2,check_overlap = TRUE)+
-  geom_sf(data = outline, fill = NA)+
   ggtitle("Cambodia")+ 
   theme(plot.title = element_text(face = "bold"))
 ggsave("dis_idp.png",width = 8, height = 6, dpi = 120)
@@ -172,7 +170,6 @@ dis_idp2 <- ggplot() +
                                ADM1_PCODE != "KH14"&
                                ADM1_PCODE != "KH20"&
                                ADM1_PCODE != "KH25"), aes(label = ADM2_EN),size = 2,check_overlap = TRUE)+
-  geom_sf(data = outline, fill = NA)+
   ggtitle("Cambodia")+ 
   theme(plot.title = element_text(face = "bold"))
 ggsave("dis_idp2.png",width = 8, height = 6, dpi = 120)
