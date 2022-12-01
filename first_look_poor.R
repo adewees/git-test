@@ -108,3 +108,71 @@ plot_poor <- plot_poor %>% mutate(IDP2_Q =ifelse(sch_aget_hh >= .359,"Q1",""))%>
   mutate(IDP2_Q =ifelse(sch_aget_hh >= 0.188 & sch_aget_hh < .258,"Q3",IDP2_Q))%>%
   mutate(IDP2_Q =ifelse(sch_aget_hh >= 0.127 & sch_aget_hh < 0.188,"Q4",IDP2_Q))%>%
   mutate(IDP2_Q =ifelse(sch_aget_hh <0.127 ,"Q5",IDP2_Q))
+register_google(key = "AIzaSyB4H7pcbjnnvEuq7yNKGcsRiXQ0s-vkCvA")
+cambodia <-st_read("~/R/Projects/Cambodia/shape/admin2/khm_admbnda_adm2_gov_20181004.shp")
+outline <- (st_union(cambodia$geom))
+cambodia2 <-st_read("~/R/Projects/Cambodia/shape/admin1/khm_admbnda_adm1_gov_20181004.shp")
+cambodia_ft <- fortify(cambodia)
+cambodia2_ft<- fortify(cambodia2)
+cam_codes <- as_tibble(cambodia_ft)%>% select(4,8,3)
+colnames(cam_codes) <- c("d_code","province", "district")
+cambodia <- sf::st_transform(cambodia, 3857)
+cambodia2 <- sf::st_transform(cambodia, 3857)
+cambodiaIDP = left_join(cambodia, plot_poor, by = c("ADM2_PCODE" = "d_code"))
+dis_idp <- ggplot() + 
+  geom_sf(data = subset(cambodiaIDP,ADM1_PCODE != "KH21" &
+                          ADM1_PCODE != "KH08"&
+                          ADM1_PCODE != "KH12"&
+                          ADM1_PCODE != "KH14"&
+                          ADM1_PCODE != "KH20"&
+                          ADM1_PCODE != "KH25"), aes(fill = as.factor(IDP_Q)))+ theme_void() +
+  scale_fill_brewer(palette = "Blues",direction = -1,name = "School age IDPoor1 children\n per 100 HH in district",labels=c("13+", "9 to 13",
+                                                                                                                            "6 to 9","4 to 6", "less than 4") )+ 
+  theme(legend.position = "right",legend.title = element_text(size = 8, face = "bold"),
+        legend.text = element_text( size = 10),
+        plot.title = element_text( size = 14, hjust = .5))+
+  geom_sf(data = subset(cambodia2_ft,ADM1_PCODE != "KH21" &
+                          ADM1_PCODE != "KH08"&
+                          ADM1_PCODE != "KH12"&
+                          ADM1_PCODE != "KH14"&
+                          ADM1_PCODE != "KH20"&
+                          ADM1_PCODE != "KH25"), aes(fill = NA),color = "dark red",lwd =  .9, show.legend = FALSE)+
+  geom_sf_text(data = subset(cambodiaIDP,ADM1_PCODE != "KH21" &
+                               ADM1_PCODE != "KH08"&
+                               ADM1_PCODE != "KH12"&
+                               ADM1_PCODE != "KH14"&
+                               ADM1_PCODE != "KH20"&
+                               ADM1_PCODE != "KH25"), aes(label = ADM2_EN),size = 2,check_overlap = TRUE)+
+  geom_sf(data = outline, fill = NA)+
+  ggtitle("Cambodia")+ 
+  theme(plot.title = element_text(face = "bold"))
+ggsave("dis_idp.png",width = 8, height = 6, dpi = 120)
+
+dis_idp2 <- ggplot() + 
+  geom_sf(data = subset(cambodiaIDP,ADM1_PCODE != "KH21" &
+                          ADM1_PCODE != "KH08"&
+                          ADM1_PCODE != "KH12"&
+                          ADM1_PCODE != "KH14"&
+                          ADM1_PCODE != "KH20"&
+                          ADM1_PCODE != "KH25"), aes(fill = as.factor(IDP2_Q)))+ theme_void() +
+  scale_fill_brewer(palette = "Blues",direction = -1,name = "School age IDPoor1 & 2 children\n per 100 HH in district",labels=c("35+", "26 t0 34",
+                                                                                                                                "19 to 25","13 to 18", "less than 13") )+ 
+  theme(legend.position = "right",legend.title = element_text(size = 8, face = "bold"),
+        legend.text = element_text( size = 10),
+        plot.title = element_text( size = 14, hjust = .5))+
+  geom_sf(data = subset(cambodia2_ft,ADM1_PCODE != "KH21" &
+                          ADM1_PCODE != "KH08"&
+                          ADM1_PCODE != "KH12"&
+                          ADM1_PCODE != "KH14"&
+                          ADM1_PCODE != "KH20"&
+                          ADM1_PCODE != "KH25"), aes(fill = NA),color = "dark red",lwd =  .9, show.legend = FALSE)+
+  geom_sf_text(data = subset(cambodiaIDP,ADM1_PCODE != "KH21" &
+                               ADM1_PCODE != "KH08"&
+                               ADM1_PCODE != "KH12"&
+                               ADM1_PCODE != "KH14"&
+                               ADM1_PCODE != "KH20"&
+                               ADM1_PCODE != "KH25"), aes(label = ADM2_EN),size = 2,check_overlap = TRUE)+
+  geom_sf(data = outline, fill = NA)+
+  ggtitle("Cambodia")+ 
+  theme(plot.title = element_text(face = "bold"))
+ggsave("dis_idp2.png",width = 8, height = 6, dpi = 120)
